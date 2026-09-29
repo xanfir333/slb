@@ -13,15 +13,28 @@
         rel="stylesheet"
         href="css/styles.css"
     >
+
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js">
     </script>
+
     <script
         src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
     </script>
+
 </head>
-<body><div class="page">
-<h1>Import Tracker</h1>
+<body>
+<div class="page">
+
+<div class="topbar">
+  <div class="title-wrap">
+    <h1>Import Guarantee Tracker</h1>
+    <p class="subtitle">Customs Declaration &amp; Commercial Invoice Processing</p>
+  </div>
+  <div class="logo-wrap">
+    <img src="SLB-Logo.jpg" alt="SLB logo" class="company-logo">
+  </div>
+</div>
 <div class="panel upload-grid">
   <label class="drop-zone" id="pdfDrop"><strong>Customs Declaration PDF</strong><span class="file-name" id="pdfName">Click or drop a PDF here</span><input type="file" id="pdfFile" accept=".pdf,application/pdf"></label>
   <label class="drop-zone" id="excelDrop"><strong>Commercial Invoice Excel</strong><span class="file-name" id="excelName">Click or drop an Excel file here</span><input type="file" id="excelFile" accept=".xlsx,.xls,.xlsm"></label>
@@ -30,7 +43,27 @@
 <div class="kpis" id="kpis" style="display:none"><div class="kpi" id="kpiMrn"><div class="label">MRN</div><div class="value" id="vMrn">—</div></div><div class="kpi" id="kpiTransport"><div class="label">Transport</div><div class="value" id="vTransport">—</div></div><div class="kpi" id="kpiInvoice"><div class="label">Invoice</div><div class="value" id="vInvoice">—</div></div><div class="kpi" id="kpiLines"><div class="label">Invoice lines</div><div class="value" id="vLines">0</div></div><div class="kpi" id="kpiMatch"><div class="label">Customs cross-check</div><div class="value" id="vMatch">—</div></div></div>
 <div class="panel" id="status">Waiting for documents...</div>
 <details class="panel" id="validationPanel" style="display:none"><summary>Validation details</summary><div id="validationText"></div></details>
-<div class="table-container"><table id="trackerTable"><thead><tr><th rowspan="2" class="group">Transport Number</th><th colspan="5" class="group">Import Custom Declaration</th><th colspan="6" class="group">Commercial Invoice</th><th rowspan="2" class="group">Transport Document</th><th rowspan="2" class="group">Guarantee Paid</th><th rowspan="2" class="group">Guarantee Claimed</th><th rowspan="2" class="group">Closed</th></tr><tr><th class="green">MRN</th><th class="green">Date</th><th class="green">Declarant</th><th class="green">Importeur</th><th class="green">Temporary/Permanent</th><th class="blue">Product Line</th><th class="blue">No.</th><th class="blue">Date</th><th class="blue">Part Number</th><th class="blue">Serial Number</th><th class="blue">Item Description</th></tr></thead><tbody id="tbody"></tbody></table></div>
+<div class="table-container">
+<table id="trackerTable">
+<colgroup>
+  <col class="col-transport">
+  <col class="col-mrn">
+  <col class="col-declaration-date">
+  <col class="col-declarant">
+  <col class="col-importer">
+  <col class="col-regime">
+  <col class="col-product-line">
+  <col class="col-number">
+  <col class="col-invoice-date">
+  <col class="col-part-number">
+  <col class="col-serial-number">
+  <col class="col-description">
+  <col class="col-transport-document">
+  <col class="col-guarantee-paid">
+  <col class="col-guarantee-claimed">
+  <col class="col-closed">
+</colgroup>
+<thead><tr><th rowspan="2" class="group">Transport Number</th><th colspan="5" class="group">Import Custom Declaration</th><th colspan="6" class="group">Commercial Invoice</th><th rowspan="2" class="group">Transport Document</th><th rowspan="2" class="group">Guarantee Paid</th><th rowspan="2" class="group">Guarantee Claimed</th><th rowspan="2" class="group">Closed</th></tr><tr><th class="green">MRN</th><th class="green">Date</th><th class="green">Declarant</th><th class="green">Importeur</th><th class="green">Temporary/Permanent</th><th class="blue">Product Line</th><th class="blue">No.</th><th class="blue">Date</th><th class="blue">Part Number</th><th class="blue">Serial Number</th><th class="blue">Item Description</th></tr></thead><tbody id="tbody"></tbody></table></div>
 </div>
 <script>
 'use strict';
@@ -44,7 +77,7 @@ function cellText(v){return v instanceof Date?formatDate(v):cleanText(v)}
 function firstMatch(text,patterns){for(const p of patterns){const m=text.match(p);if(m&&cleanText(m[1]))return cleanText(m[1])}return ''}
 function compactTR(v){return cleanText(v).replace(/[\s-]+/g,'').toUpperCase()}
 function findTR(text){const m=String(text||'').match(/\bTR(?:[\s-]*[A-Z0-9]){8,40}\b/i);return m?compactTR(m[0]):''}
-    
+
 /* PDF: rebuild visual lines using PDF text coordinates, rather than assuming every text item is a line. */
 async function extractPDF(file){const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;const pages=[];for(let p=1;p<=pdf.numPages;p++){const page=await pdf.getPage(p), content=await page.getTextContent(), groups=[];for(const item of content.items){const s=cleanText(item.str);if(!s)continue;const x=item.transform?.[4]??0,y=item.transform?.[5]??0;let g=groups.find(a=>Math.abs(a.y-y)<2.5);if(!g){g={y,items:[]};groups.push(g)}g.items.push({x,s})}groups.sort((a,b)=>b.y-a.y);const lines=groups.map(g=>g.items.sort((a,b)=>a.x-b.x).map(i=>i.s).join(' ').replace(/\s+/g,' ').trim()).filter(Boolean);pages.push(lines)}return {pages,text:pages.flat().join('\n')}}
 function pdfMRN(t){return firstMatch(t,[/\bMRN\s*[:#-]?\s*([A-Z0-9]{15,25})\b/i,/\b(\d{2}[A-Z]{2}[A-Z0-9]{14,20})\b/])}
@@ -83,6 +116,4 @@ function downloadExcel(){if(!$('tbody').rows.length){alert('Generate the tracker
 function clearTracker(){$('tbody').innerHTML='';$('status').className='panel';$('status').textContent='Waiting for documents...';$('validationPanel').style.display='none';$('validationText').textContent='';$('kpis').style.display='none';$('pdfFile').value='';$('excelFile').value='';$('pdfName').textContent='Click or drop a PDF here';$('excelName').textContent='Click or drop an Excel file here';$('pdfDrop').classList.remove('loaded');$('excelDrop').classList.remove('loaded');lastResult=null}
 function setupDrop(zoneId,inputId,nameId){const z=$(zoneId),input=$(inputId),name=$(nameId);input.addEventListener('change',()=>{if(input.files[0]){name.textContent='✓ '+input.files[0].name;z.classList.add('loaded')}});['dragenter','dragover'].forEach(ev=>z.addEventListener(ev,e=>{e.preventDefault();z.classList.add('drag')}));['dragleave','drop'].forEach(ev=>z.addEventListener(ev,e=>{e.preventDefault();z.classList.remove('drag')}));z.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(!f)return;const dt=new DataTransfer();dt.items.add(f);input.files=dt.files;input.dispatchEvent(new Event('change'))})}
 setupDrop('pdfDrop','pdfFile','pdfName');setupDrop('excelDrop','excelFile','excelName');
-</script>
-</body>
-</html>
+</script></body></html>
