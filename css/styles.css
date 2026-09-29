@@ -133,19 +133,20 @@ h1 {
     margin-bottom: 0;
 }
 
+.company-logo {
+    display: block;
+    width: 58px;
+    height: auto;
+    object-fit: contain;
+}
+
 .logo-wrap {
     flex-shrink: 0;
     display: flex;
     justify-content: flex-end;
     align-items: flex-start;
-}
-
-.company-logo {
-    display: block;
-    width: 165px;
-    max-width: 22vw;
-    height: auto;
-    object-fit: contain;
+    margin-left: auto;
+    padding-top: 2px;
 }
 
 
@@ -1014,19 +1015,6 @@ tbody tr:hover td:not(.manual) {
         flex: 1 1 auto;
     }
 
-}
-
-
-@media (max-width: 600px) {
-
-    .topbar {
-        gap: 12px;
-    }
-
-    .company-logo {
-        width: 110px;
-        max-width: 34vw;
-    }
 
 
 
