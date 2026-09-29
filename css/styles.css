@@ -112,6 +112,42 @@ h1 {
     line-height: 1.5;
 }
 
+/* =========================================================
+   TOP BAR + COMPANY LOGO
+========================================================= */
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 18px;
+}
+
+.title-wrap {
+    flex: 1;
+    min-width: 0;
+}
+
+.title-wrap .subtitle {
+    margin-bottom: 0;
+}
+
+.logo-wrap {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+}
+
+.company-logo {
+    display: block;
+    width: 165px;
+    max-width: 22vw;
+    height: auto;
+    object-fit: contain;
+}
+
 
 /* =========================================================
    GENERIC PANEL
@@ -577,17 +613,15 @@ details summary:hover {
 ========================================================= */
 
 table {
-    width: max-content;
-
-    min-width: 100%;
+    width: 2790px;
+    min-width: 2790px;
 
     border-collapse: separate;
-
     border-spacing: 0;
 
     background: white;
 
-    table-layout: auto;
+    table-layout: fixed;
 }
 
 
@@ -701,90 +735,71 @@ th.blue {
 
 /* =========================================================
    COLUMN WIDTHS
+   COLGROUP keeps widths correct even with rowspan / colspan
 ========================================================= */
 
-/* Transport Number */
-#trackerTable td:nth-child(1),
-#trackerTable th:nth-child(1) {
-    min-width: 175px;
+.col-transport {
+    width: 180px;
 }
 
-
-/* MRN */
-#trackerTable td:nth-child(2) {
-    min-width: 205px;
+.col-mrn {
+    width: 210px;
 }
 
-
-/* Declaration Date */
-#trackerTable td:nth-child(3) {
-    min-width: 105px;
+.col-declaration-date {
+    width: 110px;
 }
 
-
-/* Declarant */
-#trackerTable td:nth-child(4) {
-    min-width: 250px;
-
-    max-width: 300px;
+.col-declarant {
+    width: 260px;
 }
 
-
-/* Importeur */
-#trackerTable td:nth-child(5) {
-    min-width: 250px;
-
-    max-width: 300px;
+.col-importer {
+    width: 260px;
 }
 
-
-/* Temporary / Permanent */
-#trackerTable td:nth-child(6) {
-    min-width: 145px;
+.col-regime {
+    width: 155px;
 }
 
-
-/* Product Line */
-#trackerTable td:nth-child(7) {
-    min-width: 150px;
+.col-product-line {
+    width: 160px;
 }
 
-
-/* No. */
-#trackerTable td:nth-child(8) {
-    min-width: 65px;
+.col-number {
+    width: 70px;
 }
 
-
-/* Invoice Date */
-#trackerTable td:nth-child(9) {
-    min-width: 105px;
+.col-invoice-date {
+    width: 110px;
 }
 
-
-/* Part Number */
-#trackerTable td:nth-child(10) {
-    min-width: 140px;
+.col-part-number {
+    width: 150px;
 }
 
-
-/* Serial Number */
-#trackerTable td:nth-child(11) {
-    min-width: 140px;
+.col-serial-number {
+    width: 160px;
 }
 
-
-/* Description */
-#trackerTable td:nth-child(12) {
-    min-width: 310px;
-
-    max-width: 420px;
+.col-description {
+    width: 330px;
 }
 
+.col-transport-document {
+    width: 175px;
+}
 
-/* Manual fields */
-#trackerTable td:nth-child(n+13) {
-    min-width: 145px;
+.col-guarantee-paid {
+    width: 145px;
+}
+
+.col-guarantee-claimed {
+    width: 155px;
+}
+
+.col-closed {
+    width: 110px;
 }
 
 
@@ -958,6 +973,17 @@ tbody tr:hover td:not(.manual) {
 
 @media (max-width: 900px) {
 
+    .topbar {
+        align-items: center;
+    }
+
+    .company-logo {
+        width: 135px;
+        max-width: 32vw;
+    }
+
+
+
     .page {
         padding: 16px 10px 30px;
     }
@@ -992,6 +1018,17 @@ tbody tr:hover td:not(.manual) {
 
 
 @media (max-width: 600px) {
+
+    .topbar {
+        gap: 12px;
+    }
+
+    .company-logo {
+        width: 110px;
+        max-width: 34vw;
+    }
+
+
 
     .kpis {
         grid-template-columns: 1fr;
