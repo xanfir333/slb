@@ -1,33 +1,24 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
-
     <title>
         Import Guarantee Tracker
     </title>
-
     <link
         rel="stylesheet"
         href="css/styles.css"
     >
-
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js">
     </script>
-
     <script
         src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
     </script>
-
 </head>
 <body><div class="page">
 <h1>Import Tracker</h1>
@@ -53,7 +44,7 @@ function cellText(v){return v instanceof Date?formatDate(v):cleanText(v)}
 function firstMatch(text,patterns){for(const p of patterns){const m=text.match(p);if(m&&cleanText(m[1]))return cleanText(m[1])}return ''}
 function compactTR(v){return cleanText(v).replace(/[\s-]+/g,'').toUpperCase()}
 function findTR(text){const m=String(text||'').match(/\bTR(?:[\s-]*[A-Z0-9]){8,40}\b/i);return m?compactTR(m[0]):''}
-
+    
 /* PDF: rebuild visual lines using PDF text coordinates, rather than assuming every text item is a line. */
 async function extractPDF(file){const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;const pages=[];for(let p=1;p<=pdf.numPages;p++){const page=await pdf.getPage(p), content=await page.getTextContent(), groups=[];for(const item of content.items){const s=cleanText(item.str);if(!s)continue;const x=item.transform?.[4]??0,y=item.transform?.[5]??0;let g=groups.find(a=>Math.abs(a.y-y)<2.5);if(!g){g={y,items:[]};groups.push(g)}g.items.push({x,s})}groups.sort((a,b)=>b.y-a.y);const lines=groups.map(g=>g.items.sort((a,b)=>a.x-b.x).map(i=>i.s).join(' ').replace(/\s+/g,' ').trim()).filter(Boolean);pages.push(lines)}return {pages,text:pages.flat().join('\n')}}
 function pdfMRN(t){return firstMatch(t,[/\bMRN\s*[:#-]?\s*([A-Z0-9]{15,25})\b/i,/\b(\d{2}[A-Z]{2}[A-Z0-9]{14,20})\b/])}
@@ -92,4 +83,6 @@ function downloadExcel(){if(!$('tbody').rows.length){alert('Generate the tracker
 function clearTracker(){$('tbody').innerHTML='';$('status').className='panel';$('status').textContent='Waiting for documents...';$('validationPanel').style.display='none';$('validationText').textContent='';$('kpis').style.display='none';$('pdfFile').value='';$('excelFile').value='';$('pdfName').textContent='Click or drop a PDF here';$('excelName').textContent='Click or drop an Excel file here';$('pdfDrop').classList.remove('loaded');$('excelDrop').classList.remove('loaded');lastResult=null}
 function setupDrop(zoneId,inputId,nameId){const z=$(zoneId),input=$(inputId),name=$(nameId);input.addEventListener('change',()=>{if(input.files[0]){name.textContent='✓ '+input.files[0].name;z.classList.add('loaded')}});['dragenter','dragover'].forEach(ev=>z.addEventListener(ev,e=>{e.preventDefault();z.classList.add('drag')}));['dragleave','drop'].forEach(ev=>z.addEventListener(ev,e=>{e.preventDefault();z.classList.remove('drag')}));z.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(!f)return;const dt=new DataTransfer();dt.items.add(f);input.files=dt.files;input.dispatchEvent(new Event('change'))})}
 setupDrop('pdfDrop','pdfFile','pdfName');setupDrop('excelDrop','excelFile','excelName');
-</script></body></html>
+</script>
+</body>
+</html>
